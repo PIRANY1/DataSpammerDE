@@ -1,0 +1,32 @@
+name: Dataspammer Funktions Test
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+  
+jobs:
+  Debug-Test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+      - name: Git Installation Verifizieren
+        run: |
+          git --version
+
+      - name: Repository klonen und PR-Branch auschecken
+        run: |
+          git clone https://github.com/PIRANY1/DataSpammer
+          cd DataSpammer
+          git fetch origin ${{ github.event.pull_request.head.ref }}
+          git checkout ${{ github.event.pull_request.head.ref }}
+
+      - name: Debug-Test ausführen
+        run: |
+          cd DataSpammer
+          cmd.exe /c ${{ github.workspace }}\DataSpammer\dataspammer.bat debugtest
+          
