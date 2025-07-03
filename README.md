@@ -1,8 +1,11 @@
 # DataSpammer
 
-Read this in: [English](README.md)
+![Tests](https://github.com/PIRANY1/wait-exe/actions/workflows/workflow.yml/badge.svg)
 
-## Features
+
+Read this in: [English](https://github.com/PIRANY1/DataSpammer/)
+
+## Funktionalität
 > [!IMPORTANT]  
 > Das Ganze Skript wird aktuell in der folgenden [PR](https://github.com/PIRANY1/DataSpammer/pull/27) überarbeitet.
 > Deshalb ist der 'main' Branch aktuell nicht in der entwicklung.

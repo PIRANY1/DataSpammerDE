@@ -87,6 +87,7 @@
 ::      V6 Stuff:
 ::      Verify Basis Functions & Custom Dir Install
 ::      Check WT Launching with same PID
+::      Emojis Verwenden
 
 :top
     @echo off
@@ -96,96 +97,93 @@
     @echo Initialisieren...
     @setlocal ENABLEDELAYEDEXPANSION
 
-    :: Improve NT Compatabilty - Made by Gradlew
+    :: NT Kompatibilität verbessern - Erstellt von Gradlew
     if "%OS%"=="Windows_NT" setlocal
     set "DIRNAME=%~dp0"
     if "%DIRNAME%"=="" set DIRNAME=.
 
-    :: Set Window Size
+    :: Fenster Größe setzen
     mode con: cols=120 lines=35
 
-    :: Development / Production Flag
+    :: Entwicklungs / Produktions Version
     set "current_script_version=development"
 
     set "exec-dir=%~dp0"
 
-    :: Can be Implemented along if errorlevel ...
     set "errormsg=echo: &call :color _Red "====== ERROR ======" &echo:"
     
-    :: Predefine _erl to ensure errorlevel or choice inputs function correctly
+    :: _erl vordefinieren
     set "_erl=FFFF"
 
-    :: Allows ASCII stuff without Codepage Settings - Not My Work - Credits to ?
-    :: Properly Escape Symbols like | ! & ^ > < etc. when using echo (%$Echo% " Text)
+    :: ASCII Funktionen in einfachem Echo erlauben - Nicht meine Arbeit
     SET $Echo=FOR %%I IN (1 2) DO IF %%I==2 (SETLOCAL EnableDelayedExpansion ^& FOR %%A IN (^^^!Text:""^^^^^=^^^^^"^^^!) DO ENDLOCAL ^& ENDLOCAL ^& ECHO %%~A) ELSE SETLOCAL DisableDelayedExpansion ^& SET Text=
 
-    :: Check for NCS Support
-    :: NCS is required for ANSI / Color Support
+    :: NCS unterstütung überprüfen, wird für Emoji und ANSI Farben benötigt
     call :check_NCS
     if "%_NCS%"=="1" ( 
-        call :color _Green "ANSI Color Support is enabled"
+        call :color _Green "ANSI Farb Unterstützung ist aktiviert." okay
     ) else (
-        echo ANSI Color Support is not enabled.
+        echo ANSI Farb Unterstützung ist nicht aktiviert.
     )
 
-    :: Parse Correct Timeout & Ping Locations otherwise WOW64 May cause issues.
+    :: Richtiges Timeout und Ping finden
     for /f "delims=" %%P in ('where ping.exe 2^>nul') do set "ping=%%P"
     if not defined PING (
         %errormsg%
-        call :color _Red "Ping is not found."
-        call :color _Red "Please verify that PING is available in your PATH."
+        call :color _Red "Ping wurde nicht gefunden."
+        call :color _Red "Bitte verifizen, das PING im PATH verfügbar ist."
         call :sys.lt 10 count
         goto cancel
     ) else (
-        call :color _Green "Ping found at: !PING!"
+        call :color _Green "PING gefunden: !PING!"
     )
     
     for /f "delims=" %%T in ('where timeout.exe 2^>nul') do set "timeout=%%T"
     if not defined TIMEOUT (
         %errormsg%
-        call :color _Red "Timeout is not found."
-        call :color _Red "Please verify that TIMEOUT is available in your PATH."
+        call :color _Red "Timeout wurde nicht gefunden." error
+        call :color _Red "Bitte verifizen, das Timeout im PATH verfügbar ist." error
         call :sys.lt 10 count
         goto cancel
     ) else (
-        call :color _Green "Timeout found at: !TIMEOUT!"
+        call :color _Green "Timeout gefunden: !TIMEOUT!" okay
     )
 
-    :: Set CMD Path based on Context - 64bit or 32bit
+    :: CMD Pfad basierend auf Kontext setzen
     set "cmdPath=%ComSpec%"
 
-    :: No Dependency Functions (Arguments) - Documented at help.startup
+    :: Argumente ohne Bedigungen überprüfen
     if "%~1"=="version" title DataSpammer && goto version
     if "%~1"=="--help" title DataSpammer && goto help.startup
     if "%~1"=="help" title DataSpammer && goto help.startup
 
-    :: Check if Script is running from Temp Folder
+    :: Überprüfen das das Script nicht aus dem Temp Ordner gestartet wird
     if /I "%~dp0"=="%TEMP%" (
         cls
         %errormsg%
-        call :color _Red "The script was launched from the temp folder."
-        call :color _Yellow "You are most likely running the script directly from the archive file."
+        call :color _Red "Das Script wurde aus dem Temp Ordner gestartet."
+        call :color _Yellow "Installation könnte fehlschlagen."
         call :sys.lt 10 count
         goto cancel
     )
     
-    :: Check if Script is running from Network Drive
+    :: Überprüfen das das Script nicht von einem Netzlaufwerk gestartet wird
     if /I "%~d0"=="\\\\" (
         %errormsg%
-        call :color _Red "The script was launched from a network drive."
-        call :color _Yellow "Installation may not work properly."
+        call :color _Red "Das Script wurde von einem Netzlaufwerk gestartet."
+        call :color _Yellow "Installation könnte fehlschlagen."
         call :sys.lt 10 count
     )
 
     :: Check if Script is running from a UNC Path
     if /I "%~d0"=="\\" (
         %errormsg%
-        call :color _Red "The script was launched from a UNC path."
-        call :color _Yellow "Installation may not work properly."
+        call :color _Red "Das Script wurde von einem UNC Pfad gestartet."
+        call :color _Yellow "Installation könnte fehlschlagen."
         call :sys.lt 10 count
     )
 
-    :: Check Windows Version - Win 10 & 11 have certutil and other commands needed. Win 8.1 and below not have them
+    :: Windows Version Überprüfen - Win 10 & 11 haben certutil und andere benötigte Befehle. Win 8.1 und älter nicht
     call :win.version.check
     for /f "tokens=2 delims=[]" %%a in ('ver') do set "ver_full=%%a"
     for /f "tokens=1-4 delims=." %%a in ("%ver_full%") do (
@@ -202,17 +200,17 @@
     if defined winver (
         cls
         %errormsg%
-        echo Detected Windows %winver%
-        call :color _Yellow "Warning: Some features may not work on this version."
-        call :color _Red "For full compatibility, please update to Windows 10 or 11."
-        call :color _Yellow "Note: certutil and other tools may be missing on older Windows versions."
+        echo Windows Version %winver% erkannt.
+        call :color _Yellow "Warnung: Manche funktionen könnten nicht funktionieren."
+        call :color _Red "Für Volle Kompatibilität wird Windows 10 oder höher benötigt."
+        call :color _Yellow "Certutil und andere Befehle sind nicht verfügbar."
         call :sys.lt 10 count
     ) else (
-        call :color _Green "Windows Version is sufficient: %ver_full%"
+        call :color _Green "Windows Version ist ausreichend: %ver_full%"
     )    
 
 
-    :: Parse Powershell Location
+    :: Powershell Pfad finden
     for /f "tokens=* delims=" %%O in ('where powershell') do (
         set "line_powershell=%%O"
         for /f "tokens=* delims=" %%A in ("!line_powershell!") do set "powershell_location=%%A"
